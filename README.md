@@ -1,68 +1,228 @@
-# CodeIgniter 4 Application Starter
+<p align="center">
+  <a href="https://codeigniter.com" target="_blank">
+    <img src="public/images/codeigniter-logo.png" width="300" alt="CodeIgniter Logo">
+  </a>
+</p>
 
-## What is CodeIgniter?
+<p align="center">
+  <img src="https://img.shields.io/badge/PHP-8.1%2B-blue" />
+  <img src="https://img.shields.io/badge/CodeIgniter-4.x-red" />
+  <img src="https://img.shields.io/badge/JWT-Authentication-green" />
+  <img src="https://img.shields.io/badge/License-MIT-lightgrey" />
+</p>
 
-CodeIgniter is a PHP full-stack web framework that is light, fast, flexible and secure.
-More information can be found at the [official site](https://codeigniter.com).
+# Employee Management API (CodeIgniter 4)
 
-This repository holds a composer-installable app starter.
-It has been built from the
-[development repository](https://github.com/codeigniter4/CodeIgniter4).
+This project is a **RESTful API backend** built with **CodeIgniter 4** for managing employees.  
+It includes **JWT authentication**, **CORS support**, and **protected CRUD endpoints**.
 
-More information about the plans for version 4 can be found in [CodeIgniter 4](https://forum.codeigniter.com/forumdisplay.php?fid=28) on the forums.
 
-You can read the [user guide](https://codeigniter.com/user_guide/)
-corresponding to the latest version of the framework.
 
-## Installation & updates
 
-`composer create-project codeigniter4/appstarter` then `composer update` whenever
-there is a new release of the framework.
+---
 
-When updating, check the release notes to see if there are any changes you might need to apply
-to your `app` folder. The affected files can be copied or merged from
-`vendor/codeigniter4/framework/app`.
+## 🛠 Prerequisites
 
-## Setup
+Make sure you have the following installed:
 
-Copy `env` to `.env` and tailor for your app, specifically the baseURL
-and any database settings.
+- PHP 8.1+
+- Composer
+- MySQL
+- CodeIgniter 4
+- Postman (for testing)
+- Node.js (if using React frontend)
 
-## Important Change with index.php
+---
 
-`index.php` is no longer in the root of the project! It has been moved inside the *public* folder,
-for better security and separation of components.
+## ⚡ Setup Instructions (CodeIgniter)
 
-This means that you should configure your web server to "point" to your project's *public* folder, and
-not to the project root. A better practice would be to configure a virtual host to point there. A poor practice would be to point your web server to the project root and expect to enter *public/...*, as the rest of your logic and the
-framework are exposed.
+### 1️⃣ Clone the repository
+```bash
+git clone <your-repo-url>
+cd employee-api
+```
+### 2️⃣ Install dependencies
+```bash
+composer install
+```
 
-**Please** read the user guide for a better explanation of how CI4 works!
+### 3️⃣ Configure .env file
 
-## Repository Management
+Copy the environment file:
+```bash
+cp env .env
+```
 
-We use GitHub issues, in our main repository, to track **BUGS** and to track approved **DEVELOPMENT** work packages.
-We use our [forum](http://forum.codeigniter.com) to provide SUPPORT and to discuss
-FEATURE REQUESTS.
+Edit .env and update the following:
+```bash
+CI_ENVIRONMENT = development
 
-This repository is a "distribution" one, built by our release preparation script.
-Problems with it can be raised on our forum, or as issues in the main repository.
+JWT_SECRET=ThisIsAVeryLongSecretKeyAtLeast32Chars!!
 
-## Server Requirements
+database.default.hostname = localhost
+database.default.database = employee_api
+database.default.username = root
+database.default.password =
+database.default.DBDriver = MySQLi
+```
+### 4️⃣ Run migrations
+```bash
+php spark migrate
+```
+### 5️⃣ Seed sample data
+```bash
+php spark db:seed UserSeeder
+php spark db:seed EmployeeSeeder
+```
+### 6️⃣ Start the development server
+```bash
+php spark serve
+```
+Server will run at :
+```bash
+http://localhost:8080
+```
+## 🌐 CORS Configuration
 
-PHP version 8.1 or higher is required, with the following extensions installed:
+CORS is enabled to allow frontend access from:
 
-- [intl](http://php.net/manual/en/intl.requirements.php)
-- [mbstring](http://php.net/manual/en/mbstring.installation.php)
+http://127.0.0.1:5177
 
-> [!WARNING]
-> - The end of life date for PHP 7.4 was November 28, 2022.
-> - The end of life date for PHP 8.0 was November 26, 2023.
-> - If you are still using PHP 7.4 or 8.0, you should upgrade immediately.
-> - The end of life date for PHP 8.1 will be December 31, 2025.
+http://localhost:5177
 
-Additionally, make sure that the following extensions are enabled in your PHP:
+Configured in:
 
-- json (enabled by default - don't turn it off)
-- [mysqlnd](http://php.net/manual/en/mysqlnd.install.php) if you plan to use MySQL
-- [libcurl](http://php.net/manual/en/curl.requirements.php) if you plan to use the HTTP\CURLRequest library
+```bash
+app/Config/Cors.php
+```
+Allowed methods:
+```bash
+GET, POST, PUT, DELETE, OPTIONS
+```
+
+
+
+CORS filter is enabled globally in:
+```bash
+app/Config/Filters.php
+```
+
+
+---
+
+## 📁 Project Structure
+```bash
+app/
+├── Controllers/
+│ └── Api/
+│ ├── AuthController.php
+│ └── EmployeesController.php
+├── Models/
+│ ├── UserModel.php
+│ └── EmployeeModel.php
+├── Filters/
+│ ├── JwtAuthFilter.php
+│ └── JCorsFilter.php
+├── Database/
+│ ├── Migrations/
+│ └── Seeders/
+└── Config/
+├── Routes.php
+├── Cors.php
+└── Filters.php
+```
+
+
+## 🔐 Authentication Flow (JWT)
+### 1️⃣ Login
+
+- Endpoint: POST /api/login
+
+- User sends email & password
+
+- Backend validates credentials
+
+- On success, JWT token is returned
+
+```bash
+POST /api/login
+{
+  "email": "admin@test.com",
+  "password": "password"
+}
+```
+```bash
+{
+    "status": "success",
+    "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlbXBsb3llZS1hcGkiLCJpYXQiOjE3NjgxMzEzNzYsImV4cCI6MTc2ODEzNDk3NiwidWlkIjoiMSIsImVtYWlsIjoiYWRtaW5AdGVzdC5jb20ifQ.xBK1TJ87unN9BOdPQihyKUa_9XjAHrzBPu_eH5jmNYk",
+    "user": {
+        "id": "1",
+        "name": "Admin",
+        "email": "admin@test.com"
+    }
+}
+```
+
+### 2️⃣ Use Token
+
+- For all protected routes, include the token in headers:
+
+- Authorization: Bearer <JWT_TOKEN>
+
+
+
+## 🧾 Available API Endpoints
+
+Base URL:
+
+
+```bash
+http://localhost:8080/api
+```
+
+| Endpoint          | Method | Description         | Auth |
+| ----------------- | ------ | ------------------- | ---- |
+| `/login`          | POST   | Login user          | ❌    |
+| `/employees`      | GET    | Get all employees   | ✅    |
+| `/employees`      | POST   | Create new employee | ✅    |
+| `/employees/{id}` | GET    | Get employee by ID  | ✅    |
+| `/employees/{id}` | PUT    | Update employee     | ✅    |
+| `/employees/{id}` | DELETE | Delete employee     | ✅    |
+
+
+## 🧪 Testing with Postman
+
+### 1. Login → get JWT token
+
+### 2. Add token to Authorization header
+
+###  3. Test all /employees endpoints
+
+
+
+## 🚀 Useful Commands
+
+```bash
+php spark serve                 # Start server
+php spark migrate:fresh --seed  # Reset database
+php spark routes                # Show all routes
+```
+## ✅ Status
+
+✔ Authentication working  
+✔ CORS enabled  
+✔ JWT protected routes  
+✔ Ready for frontend integration  
+
+---
+
+**Author:** Fadel  
+**Framework:** CodeIgniter 4  
+**Authentication:** JWT  
+
+---
+
+
+
+
+
